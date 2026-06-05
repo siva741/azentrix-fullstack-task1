@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import SummaryCards from "../components/Summarycards";
 import TransactionForm from "../components/TransactionForm";
 import TransactionTable from "../components/TransactionTable";
+import { FiCalendar, FiList } from "react-icons/fi";
 
 function Dashboard() {
   const [transactions, setTransactions] = useState(() => {
@@ -20,6 +21,16 @@ function Dashboard() {
   const monthlyTransactions = transactions.filter((transaction) =>
     transaction.date?.startsWith(selectedMonth)
   );
+
+  const monthLabel = selectedMonth
+    ? new Date(`${selectedMonth}-01T00:00:00`).toLocaleDateString(
+        "en-IN",
+        {
+          month: "long",
+          year: "numeric",
+        }
+      )
+    : "Select a month";
 
   useEffect(() => {
     localStorage.setItem(
@@ -62,48 +73,76 @@ function Dashboard() {
     setEditingTransaction(null);
   };
 
+  const cancelEdit = () => {
+    setEditingTransaction(null);
+  };
+
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-[#f6f8fb]">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-900">
-              Monthly Dashboard
-            </h2>
-            <p className="text-sm text-slate-600">
-              Summary for the selected month.
-            </p>
-          </div>
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <section className="rounded-3xl border border-white bg-white p-5 shadow-sm shadow-slate-200/70 sm:p-6">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase text-emerald-700">
+                {monthLabel}
+              </p>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+                Monthly Dashboard
+              </h2>
+            </div>
 
-          <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
-            Month
-            <input
-              type="month"
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm"
-            />
-          </label>
-        </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:min-w-[420px]">
+              <label className="flex flex-col gap-2 text-sm font-semibold text-slate-700">
+                Month
+                <span className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5">
+                  <FiCalendar className="h-4 w-4 text-emerald-600" />
+                  <input
+                    type="month"
+                    value={selectedMonth}
+                    onChange={(e) =>
+                      setSelectedMonth(e.target.value)
+                    }
+                    className="w-full bg-transparent text-slate-950 outline-none"
+                  />
+                </span>
+              </label>
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <div className="flex items-center gap-2 text-sm font-semibold text-slate-600">
+                  <FiList className="h-4 w-4 text-cyan-600" />
+                  Entries
+                </div>
+                <p className="mt-1 text-2xl font-bold text-slate-950">
+                  {monthlyTransactions.length}
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
 
         <SummaryCards transactions={monthlyTransactions} />
 
-        <Charts transactions={monthlyTransactions} />
+        <div className="mt-8 grid gap-8 xl:grid-cols-[1.05fr_0.95fr]">
+          <TransactionForm
+            key={editingTransaction?.id ?? selectedMonth}
+            addTransaction={addTransaction}
+            editingTransaction={editingTransaction}
+            updateTransaction={updateTransaction}
+            cancelEdit={cancelEdit}
+            selectedMonth={selectedMonth}
+          />
 
-        <TransactionForm
-          addTransaction={addTransaction}
-          editingTransaction={editingTransaction}
-          updateTransaction={updateTransaction}
-        />
+          <Charts transactions={monthlyTransactions} />
+        </div>
 
         <TransactionTable
           transactions={monthlyTransactions}
           deleteTransaction={deleteTransaction}
           editTransaction={editTransaction}
         />
-      </div>
+      </main>
     </div>
   );
 }

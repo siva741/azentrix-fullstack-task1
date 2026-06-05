@@ -37,7 +37,7 @@ function Charts({ transactions }) {
   return (
     <div className="bg-white p-6 rounded-xl shadow mt-8">
       <h2 className="text-2xl font-bold mb-4">
-        Expense Breakdown
+        Monthly Expense Breakdown
       </h2>
 
       {expenseData.length === 0 ? (

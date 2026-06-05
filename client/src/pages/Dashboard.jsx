@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Charts from "../components/Charts";
 import Navbar from "../components/Navbar";
-import SummaryCards from "../components/SummaryCards";
+import SummaryCards from "../components/Summarycards";
 import TransactionForm from "../components/TransactionForm";
 import TransactionTable from "../components/TransactionTable";
 
@@ -10,8 +10,16 @@ function Dashboard() {
     return JSON.parse(localStorage.getItem("transactions")) || [];
   });
 
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    return new Date().toISOString().slice(0, 7);
+  });
+
   const [editingTransaction, setEditingTransaction] =
     useState(null);
+
+  const monthlyTransactions = transactions.filter((transaction) =>
+    transaction.date?.startsWith(selectedMonth)
+  );
 
   useEffect(() => {
     localStorage.setItem(
@@ -59,9 +67,30 @@ function Dashboard() {
       <Navbar />
 
       <div className="max-w-7xl mx-auto p-6">
-        <SummaryCards transactions={transactions} />
+        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">
+              Monthly Dashboard
+            </h2>
+            <p className="text-sm text-slate-600">
+              Summary for the selected month.
+            </p>
+          </div>
 
-        <Charts transactions={transactions} />
+          <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
+            Month
+            <input
+              type="month"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm"
+            />
+          </label>
+        </div>
+
+        <SummaryCards transactions={monthlyTransactions} />
+
+        <Charts transactions={monthlyTransactions} />
 
         <TransactionForm
           addTransaction={addTransaction}
@@ -70,7 +99,7 @@ function Dashboard() {
         />
 
         <TransactionTable
-          transactions={transactions}
+          transactions={monthlyTransactions}
           deleteTransaction={deleteTransaction}
           editTransaction={editTransaction}
         />

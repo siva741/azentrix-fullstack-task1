@@ -1,6 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-function TransactionForm({ addTransaction }) {
+function TransactionForm({
+  addTransaction,
+  editingTransaction,
+  updateTransaction,
+}) {
   const [formData, setFormData] = useState({
     title: "",
     amount: "",
@@ -9,6 +13,14 @@ function TransactionForm({ addTransaction }) {
     date: "",
   });
 
+  useEffect(() => {
+  if (!editingTransaction) return;
+
+  setTimeout(() => {
+    setFormData(editingTransaction);
+  }, 0);
+}, [editingTransaction]);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -16,11 +28,7 @@ function TransactionForm({ addTransaction }) {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    addTransaction(formData);
-
+  const resetForm = () => {
     setFormData({
       title: "",
       amount: "",
@@ -30,10 +38,24 @@ function TransactionForm({ addTransaction }) {
     });
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (editingTransaction) {
+      updateTransaction(formData);
+    } else {
+      addTransaction(formData);
+    }
+
+    resetForm();
+  };
+
   return (
     <div className="bg-white p-6 rounded-xl shadow mt-8">
       <h2 className="text-2xl font-bold mb-4">
-        Add Transaction
+        {editingTransaction
+          ? "Edit Transaction"
+          : "Add Transaction"}
       </h2>
 
       <form
@@ -93,7 +115,9 @@ function TransactionForm({ addTransaction }) {
           type="submit"
           className="bg-blue-600 text-white rounded-lg p-3"
         >
-          Add Transaction
+          {editingTransaction
+            ? "Update Transaction"
+            : "Add Transaction"}
         </button>
       </form>
     </div>

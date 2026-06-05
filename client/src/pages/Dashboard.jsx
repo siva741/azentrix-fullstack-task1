@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Charts from "../components/Charts";
 import Navbar from "../components/Navbar";
 import SummaryCards from "../components/SummaryCards";
 import TransactionForm from "../components/TransactionForm";
@@ -8,6 +9,9 @@ function Dashboard() {
   const [transactions, setTransactions] = useState(() => {
     return JSON.parse(localStorage.getItem("transactions")) || [];
   });
+
+  const [editingTransaction, setEditingTransaction] =
+    useState(null);
 
   useEffect(() => {
     localStorage.setItem(
@@ -34,6 +38,22 @@ function Dashboard() {
     );
   };
 
+  const editTransaction = (transaction) => {
+    setEditingTransaction(transaction);
+  };
+
+  const updateTransaction = (updatedTransaction) => {
+    setTransactions(
+      transactions.map((transaction) =>
+        transaction.id === updatedTransaction.id
+          ? updatedTransaction
+          : transaction
+      )
+    );
+
+    setEditingTransaction(null);
+  };
+
   return (
     <div className="min-h-screen bg-slate-100">
       <Navbar />
@@ -41,13 +61,18 @@ function Dashboard() {
       <div className="max-w-7xl mx-auto p-6">
         <SummaryCards transactions={transactions} />
 
+        <Charts transactions={transactions} />
+
         <TransactionForm
           addTransaction={addTransaction}
+          editingTransaction={editingTransaction}
+          updateTransaction={updateTransaction}
         />
 
         <TransactionTable
           transactions={transactions}
           deleteTransaction={deleteTransaction}
+          editTransaction={editTransaction}
         />
       </div>
     </div>

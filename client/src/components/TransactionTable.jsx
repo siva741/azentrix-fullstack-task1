@@ -1,6 +1,7 @@
 function TransactionTable({
   transactions,
   deleteTransaction,
+  editTransaction,
 }) {
   return (
     <div className="bg-white p-6 rounded-xl shadow mt-8">
@@ -16,7 +17,7 @@ function TransactionTable({
             <th className="p-3">Type</th>
             <th className="p-3">Category</th>
             <th className="p-3">Date</th>
-            <th className="p-3">Action</th>
+            <th className="p-3">Actions</th>
           </tr>
         </thead>
 
@@ -44,6 +45,15 @@ function TransactionTable({
               </td>
 
               <td className="p-3 text-center">
+                <button
+                  onClick={() =>
+                    editTransaction(transaction)
+                  }
+                  className="bg-yellow-500 text-white px-3 py-1 rounded mr-2"
+                >
+                  Edit
+                </button>
+
                 <button
                   onClick={() =>
                     deleteTransaction(transaction.id)

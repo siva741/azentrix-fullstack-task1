@@ -6,10 +6,23 @@ import TransactionForm from "../components/TransactionForm";
 import TransactionTable from "../components/TransactionTable";
 import { FiCalendar, FiList } from "react-icons/fi";
 
+const loadTransactions = () => {
+  try {
+    const savedTransactions = JSON.parse(
+      localStorage.getItem("transactions")
+    );
+
+    return Array.isArray(savedTransactions)
+      ? savedTransactions
+      : [];
+  } catch {
+    return [];
+  }
+};
+
 function Dashboard() {
-  const [transactions, setTransactions] = useState(() => {
-    return JSON.parse(localStorage.getItem("transactions")) || [];
-  });
+  const [transactions, setTransactions] =
+    useState(loadTransactions);
 
   const [selectedMonth, setSelectedMonth] = useState(() => {
     return new Date().toISOString().slice(0, 7);
@@ -18,9 +31,13 @@ function Dashboard() {
   const [editingTransaction, setEditingTransaction] =
     useState(null);
 
-  const monthlyTransactions = transactions.filter((transaction) =>
-    transaction.date?.startsWith(selectedMonth)
-  );
+  const monthlyTransactions = transactions.filter((transaction) => {
+    if (!selectedMonth) {
+      return true;
+    }
+
+    return String(transaction.date ?? "").startsWith(selectedMonth);
+  });
 
   const monthLabel = selectedMonth
     ? new Date(`${selectedMonth}-01T00:00:00`).toLocaleDateString(
@@ -93,7 +110,7 @@ function Dashboard() {
               </h2>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:min-w-[420px]">
+            <div className="grid gap-3 sm:grid-cols-2 lg:min-w-105">
               <label className="flex flex-col gap-2 text-sm font-semibold text-slate-700">
                 Month
                 <span className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5">
